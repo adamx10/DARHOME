@@ -7,18 +7,18 @@ const { verifyToken, checkRole } = require('../middlewares/authMiddleware');
 const listingController = new ListingController();
 
 // 1. Route pour récupérer toutes les annonces immobilières
-// Méthode : GET /
-// Accessible publiquement par tous les utilisateurs
+// Méthode : GET /api/listings
+// Accessible publiquement par tout le monde
 router.get('/', (req, res) => listingController.getAllListings(req, res));
 
 // 2. Route pour récupérer une seule annonce par son identifiant (ID)
-// Méthode : GET /:id
-// Accessible publiquement par tous les utilisateurs
+// Méthode : GET /api/listings/:id
+// Accessible publiquement par tout le monde
 router.get('/:id', (req, res) => listingController.getListingById(req, res));
 
 // 3. Route pour créer une nouvelle annonce immobilière
-// Méthode : POST /
-// Route protégée : nécessite un token valide et le rôle 'propriétaire' ou 'admin'
+// Méthode : POST /api/listings
+// Route protégée : nécessite d'être connecté (verifyToken) et d'avoir le rôle 'propriétaire' ou 'admin' (checkRole)
 router.post(
   '/',
   verifyToken,
