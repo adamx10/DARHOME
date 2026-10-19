@@ -38,7 +38,13 @@ const verifyToken = (req, res, next) => {
 const checkRole = (rolesArray) => {
   return (req, res, next) => {
     // Vérifier si l'utilisateur est connecté et si son rôle est dans la liste autorisée
-    if (!req.user || !rolesArray.includes(req.user.role)) {
+    const userRole = req.user ? req.user.role : null;
+    const isAuthorized = userRole && rolesArray.some(role => 
+      role === userRole || 
+      role.normalize("NFD").replace(/[\u0300-\u036f]/g, "") === userRole.normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+    );
+
+    if (!isAuthorized) {
       return res.status(403).json({
         message: "Accès interdit : vous n'avez pas les autorisations nécessaires pour effectuer cette action."
       });

@@ -105,6 +105,6 @@ class AuthController {
 
 }
 
-// Exportation d'une instance unique de la classe AuthController
-module.exports = new AuthController();
+// Exportation de la classe AuthController
+module.exports = AuthController;
 

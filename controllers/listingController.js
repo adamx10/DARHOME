@@ -93,6 +93,6 @@ class ListingController {
 
 }
 
-// Exportation d'une instance unique de la classe ListingController
-module.exports = new ListingController();
+// Exportation de la classe ListingController
+module.exports = ListingController;
 
