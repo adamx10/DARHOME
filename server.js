@@ -21,11 +21,15 @@ const listingRoutes = require('./routes/listingRoutes');
 // 4. Importation de Scalar pour la documentation
 const { apiReference } = require('@scalar/express-api-reference');
 
+const path = require('path');
+
 const app = express();
 
 // Middlewares globaux
 app.use(cors());
 app.use(express.json());
+// Servir le dossier des images uploadées de façon statique
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // 5. Utilisation des routes (HADCHI LI KAN NA9ES)
 app.use('/api/auth', authRoutes);

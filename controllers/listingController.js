@@ -1,5 +1,6 @@
 const Listing = require('../models/Listing');
 const User = require('../models/User');
+const Photo = require('../models/Photo');
 
 // Contrôleur gérant les opérations sur les annonces immobilières (CRUD)
 class ListingController {
@@ -92,10 +93,25 @@ class ListingController {
         disponibilite: disponibilite !== undefined ? disponibilite : true // Disponible par défaut
       });
 
-      // 3. Renvoyer l'annonce créée avec un code 201 (Créé)
+      // 3. Vérifier si des photos ont été envoyées et les sauvegarder
+      if (req.files && req.files.length > 0) {
+        for (const file of req.files) {
+          await Photo.create({
+            url: '/uploads/' + file.filename,
+            urlImage: '/uploads/' + file.filename,
+            listingId: newListing.id
+          });
+        }
+      }
+
+      // 4. Récupérer les photos créées pour cette annonce
+      const photos = await Photo.findAll({ where: { listingId: newListing.id } });
+
+      // 5. Renvoyer l'annonce créée et ses photos avec un code 201 (Créé)
       return res.status(201).json({
         message: "Annonce créée avec succès !",
-        listing: newListing
+        listing: newListing,
+        photos: photos
       });
 
     } catch (error) {

@@ -3,10 +3,15 @@ const sequelize = require('../config/database');
 
 // Définition du modèle Photo (Images associées aux annonces)
 const Photo = sequelize.define('Photo', {
-  // Lien ou chemin vers l'image
+  // URL ou chemin de l'image
+  url: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  // urlImage pour la compatibilité
   urlImage: {
     type: DataTypes.STRING,
-    allowNull: false
+    allowNull: true
   },
   // Ordre d'affichage de l'image dans la galerie de l'annonce
   ordreAffichage: {
