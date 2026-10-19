@@ -11,7 +11,14 @@ class AuthController {
       // 1. Récupérer les données envoyées par le client dans le corps de la requête
       const { nom, email, password, telephone, role } = req.body;
 
-      // 2. Vérifier si un utilisateur existe déjà avec la même adresse email
+      // 2. Vérifier que tous les champs obligatoires sont bien fournis
+      if (!nom || !email || !password || !telephone) {
+        return res.status(400).json({
+          message: "Veuillez renseigner tous les champs obligatoires : nom, email, password, telephone."
+        });
+      }
+
+      // 3. Vérifier si un utilisateur existe déjà avec la même adresse email
       const existingUser = await User.findOne({ where: { email } });
       if (existingUser) {
         return res.status(400).json({
@@ -19,20 +26,29 @@ class AuthController {
         });
       }
 
-      // 3. Hacher (sécuriser) le mot de passe avec bcrypt avant de l'enregistrer
+      // 4. Normaliser le rôle pour la base de données ('propriétaire' avec accent -> 'proprietaire')
+      let userRole = role ? role.toString().toLowerCase().trim() : 'client';
+      if (userRole === 'propriétaire') {
+        userRole = 'proprietaire';
+      }
+      if (!['client', 'proprietaire', 'admin'].includes(userRole)) {
+        userRole = 'client';
+      }
+
+      // 5. Hacher (sécuriser) le mot de passe avec bcrypt avant de l'enregistrer
       const saltRounds = 10;
       const hashedPassword = await bcrypt.hash(password, saltRounds);
 
-      // 4. Créer le nouvel utilisateur dans la base de données
+      // 6. Créer le nouvel utilisateur dans la base de données
       const newUser = await User.create({
         nom,
         email,
         password: hashedPassword,
         telephone,
-        role: role || 'client' // Rôle par défaut si non spécifié
+        role: userRole
       });
 
-      // 5. Répondre avec un code 201 (Créé) et renvoyer les données publiques de l'utilisateur
+      // 7. Répondre avec un code 201 (Créé) et renvoyer les données publiques de l'utilisateur
       return res.status(201).json({
         message: "Inscription réussie avec succès !",
         user: {
@@ -45,6 +61,7 @@ class AuthController {
       });
 
     } catch (error) {
+      console.error("❌ Erreur lors de l'inscription :", error);
       // Gestion des erreurs serveur
       return res.status(500).json({
         message: "Erreur lors de l'inscription.",
@@ -59,7 +76,14 @@ class AuthController {
       // 1. Récupérer l'email et le mot de passe saisis par l'utilisateur
       const { email, password } = req.body;
 
-      // 2. Chercher si l'utilisateur existe dans la base de données
+      // 2. Vérifier que l'email et le mot de passe sont fournis
+      if (!email || !password) {
+        return res.status(400).json({
+          message: "Veuillez fournir un email et un mot de passe."
+        });
+      }
+
+      // 3. Chercher si l'utilisateur existe dans la base de données
       const user = await User.findOne({ where: { email } });
       if (!user) {
         return res.status(404).json({
