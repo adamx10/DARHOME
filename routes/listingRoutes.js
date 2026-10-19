@@ -22,7 +22,7 @@ router.get('/:id', (req, res) => listingController.getListingById(req, res));
 router.post(
   '/',
   verifyToken,
-  checkRole(['propriétaire', 'admin']),
+  checkRole(['proprietaire', 'admin']),
   (req, res) => listingController.createListing(req, res)
 );
 
