@@ -5,12 +5,14 @@ require('dotenv').config();
 // 1. Connexion m3a la base de données (Sequelize)
 const sequelize = require('./config/database');
 
-// 2. Importation des modèles pour que Sequelize les prenne en compte
+// 2. Importation des modèles et configuration des relations
 require('./models/User');
 require('./models/Listing');
 require('./models/Photo');
 require('./models/City');
 require('./models/Favorite');
+const setupAssociations = require('./models/associations');
+setupAssociations();
 
 // 3. Importation des routes
 const authRoutes = require('./routes/authRoutes');

@@ -1,4 +1,5 @@
 const Listing = require('../models/Listing');
+const User = require('../models/User');
 
 // Contrôleur gérant les opérations sur les annonces immobilières (CRUD)
 class ListingController {
@@ -6,8 +7,15 @@ class ListingController {
   // Méthode pour récupérer toutes les annonces immobilières
   async getAllListings(req, res) {
     try {
-      // 1. Récupérer l'ensemble des annonces stockées dans la base de données
-      const listings = await Listing.findAll();
+      // 1. Récupérer l'ensemble des annonces avec les détails du propriétaire (nom, email, telephone)
+      const listings = await Listing.findAll({
+        include: [
+          {
+            model: User,
+            attributes: ['nom', 'email', 'telephone']
+          }
+        ]
+      });
 
       // 2. Renvoyer la liste des annonces au format JSON avec un code 200 (Succès)
       return res.status(200).json(listings);
@@ -27,8 +35,15 @@ class ListingController {
       // 1. Extraire l'identifiant (ID) passé dans les paramètres de l'URL (ex: /listings/:id)
       const { id } = req.params;
 
-      // 2. Chercher l'annonce correspondante par sa clé primaire (ID)
-      const listing = await Listing.findByPk(id);
+      // 2. Chercher l'annonce correspondante avec les détails du propriétaire (nom, email, telephone)
+      const listing = await Listing.findByPk(id, {
+        include: [
+          {
+            model: User,
+            attributes: ['nom', 'email', 'telephone']
+          }
+        ]
+      });
 
       // 3. Vérifier si l'annonce existe dans la base de données
       if (!listing) {
@@ -72,6 +87,7 @@ class ListingController {
         ville,
         quartier,
         prix,
+        userId: req.user.id,
         statut: statut || 'en_attente', // Statut par défaut si non précisé
         disponibilite: disponibilite !== undefined ? disponibilite : true // Disponible par défaut
       });
